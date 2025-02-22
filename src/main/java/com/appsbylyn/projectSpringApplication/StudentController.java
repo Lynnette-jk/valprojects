@@ -1,9 +1,8 @@
 package com.appsbylyn.projectSpringApplication;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,12 +20,38 @@ public class StudentController {
         return "Hello World";
     }
     @GetMapping("/students")
-    public List<Student> findAll(){
-       return studentService.findAll();
+    public ResponseEntity<List<Student>> findAll(){
+       return ResponseEntity.ok(studentService.findAll());
     }
     @PostMapping("/students")
-    public String createStudent(@RequestBody Student student){
+    public ResponseEntity<String> createStudent(@RequestBody Student student){
        studentService.createStudent(student);
-       return "Student added Successfully";
+       return new ResponseEntity<>("Student added Successfully", HttpStatus.OK);
+    }
+    @GetMapping("/students/{id}")
+
+    public ResponseEntity<Student> getStudentById(@PathVariable Long id){
+        Student student = studentService.getStudentById(id);
+        if(student != null){
+            return new ResponseEntity<>(student, HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+    }
+    @DeleteMapping("/students/{id}")
+
+    public ResponseEntity<String> deleteStudentById(@PathVariable Long id){
+        boolean deleted = studentService.deleteStudentById(id);
+        if(deleted)
+            return new ResponseEntity<>("Student Deleted Successfully", HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+    @PutMapping("/students/{id}")
+
+    public ResponseEntity<String> updateStudent(@PathVariable Long id,@RequestBody Student updatedStudent){
+        boolean updated = studentService.updateStudent(id, updatedStudent);
+        if (updated)
+            return new ResponseEntity<>("Student updated Successfully", HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 }
